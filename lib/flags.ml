@@ -62,6 +62,8 @@ let ide_slave = ref false
 let raw_print = ref false
 let univ_print = ref false
 
+let evars_print = ref false
+
 let we_are_parsing = ref false
 
 (* Compatibility mode *)

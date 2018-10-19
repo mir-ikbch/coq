@@ -493,41 +493,6 @@ let pr_transparent_state (ids, csts) =
   hv 0 (str"VARIABLES: " ++ pr_idpred ids ++ fnl () ++
 	str"CONSTANTS: " ++ pr_cpred csts ++ fnl ())
 
-(* display complete goal *)
-let default_pr_goal gs =
-  let g = sig_it gs in
-  let sigma = project gs in
-  let env = Goal.V82.env sigma g in
-  let concl = Goal.V82.concl sigma g in
-  let goal =
-    pr_context_of env sigma ++ cut () ++
-      str "============================" ++ cut ()  ++
-      pr_goal_concl_style_env env sigma concl in
-  str "  " ++ v 0 goal
-
-(* display a goal tag *)
-let pr_goal_tag g =
-  let s = " (ID " ^ Goal.uid g ^ ")" in
-  str s
-
-(* display a goal name *)
-let pr_goal_name sigma g =
-  if should_gname() then str " " ++ Pp.surround (pr_existential_key sigma g)
-  else mt ()
-
-let pr_goal_header nme sigma g =
-  let (g,sigma) = Goal.V82.nf_evar sigma g in
-  str "subgoal " ++ nme ++ (if should_tag() then pr_goal_tag g else str"")
-  ++ (if should_gname() then str " " ++ Pp.surround (pr_existential_key sigma g) else mt ())  
-
-(* display the conclusion of a goal *)
-let pr_concl n sigma g =
-  let (g,sigma) = Goal.V82.nf_evar sigma g in
-  let env = Goal.V82.env sigma g in
-  let pc = pr_goal_concl_style_env env sigma (Goal.V82.concl sigma g) in
-  let header = pr_goal_header (int n) sigma g in
-  header ++ str " is:" ++ cut () ++ str" "  ++ pc
-
 (* display evar type: a context and a type *)
 let pr_evgl_sign sigma evi =
   let env = evar_env evi in
@@ -579,6 +544,46 @@ let pr_evars_int sigma ~shelf ~givenup i evs =
 
 let pr_evars sigma evs =
   pr_evars_int_hd (fun i evk evi -> pr_evar sigma (evk,evi)) sigma 1 (Evar.Map.bindings evs)
+
+
+(* display complete goal *)
+let default_pr_goal gs =
+  let g = sig_it gs in
+  let sigma = project gs in
+  let env = Goal.V82.env sigma g in
+  let concl = Goal.V82.concl sigma g in
+  let goal =
+    (if !Flags.evars_print then
+      pr_evars sigma (Evarutil.non_instantiated sigma) ++ cut ()
+    else
+      str "") ++
+    pr_context_of env sigma ++ cut () ++
+      str "============================" ++ cut ()  ++
+      pr_goal_concl_style_env env sigma concl in
+  str "  " ++ v 0 goal
+
+(* display a goal tag *)
+let pr_goal_tag g =
+  let s = " (ID " ^ Goal.uid g ^ ")" in
+  str s
+
+(* display a goal name *)
+let pr_goal_name sigma g =
+  if should_gname() then str " " ++ Pp.surround (pr_existential_key sigma g)
+  else mt ()
+
+let pr_goal_header nme sigma g =
+  let (g,sigma) = Goal.V82.nf_evar sigma g in
+  str "subgoal " ++ nme ++ (if should_tag() then pr_goal_tag g else str"")
+  ++ (if should_gname() then str " " ++ Pp.surround (pr_existential_key sigma g) else mt ())
+
+(* display the conclusion of a goal *)
+let pr_concl n sigma g =
+  let (g,sigma) = Goal.V82.nf_evar sigma g in
+  let env = Goal.V82.env sigma g in
+  let pc = pr_goal_concl_style_env env sigma (Goal.V82.concl sigma g) in
+  let header = pr_goal_header (int n) sigma g in
+  header ++ str " is:" ++ cut () ++ str" "  ++ pc
 
 (* Display a list of evars given by their name, with a prefix *)
 let pr_ne_evar_set hd tl sigma l =

@@ -1396,6 +1396,13 @@ let _ =
 let _ =
   declare_bool_option
     { optdepr  = false;
+      optname  = "printing evars";
+      optkey   = ["Printing";"Evars"];
+      optread  = (fun () -> !Flags.evars_print);
+      optwrite = (fun b -> Flags.evars_print := b) }
+let _ =
+  declare_bool_option
+    { optdepr  = false;
       optname  = "use of the program extension";
       optkey   = ["Program";"Mode"];
       optread  = (fun () -> !Flags.program_mode);

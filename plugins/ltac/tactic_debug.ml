@@ -52,8 +52,10 @@ let db_pr_goal gl =
   let env = Proofview.Goal.env gl in
   let concl = Proofview.Goal.concl gl in
   let penv = print_named_context env in
+  let sigma = Proofview.Goal.sigma gl in
   let pc = print_constr_env env (Tacmach.New.project gl) concl in
-    str"  " ++ hv 0 (penv ++ fnl () ++
+    str"  " ++ hv 0 ((if !Flags.evars_print then Printer.pr_evars sigma (Evarutil.non_instantiated sigma) ++ fnl () else str "") ++
+                   penv ++ fnl () ++
                    str "============================" ++ fnl ()  ++
                    str" "  ++ pc) ++ fnl ()
 

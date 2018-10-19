@@ -45,6 +45,9 @@ val raw_print : bool ref
 (* Univ print flag, never set anywere. Maybe should belong to Univ? *)
 val univ_print : bool ref
 
+(* Set Printing Evars flag. *)
+val evars_print : bool ref
+
 type compat_version = V8_6 | V8_7 | Current
 val compat_version : compat_version ref
 val version_compare : compat_version -> compat_version -> int
